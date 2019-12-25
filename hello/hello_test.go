@@ -11,17 +11,17 @@ func TestHello(t *testing.T) {
 	}
 
 	t.Run("saying hello to people", func(t *testing.T) {
-		got := Hello("Chris")
+		got := Hello("Chris", "")
 		want := "Hello, Chris"
 
 		assertCorrectMessage(t, got, want)
 	})
 
-	t.Run("当输入为空时, 默认提供world", func(t *testing.T) {
-		got := Hello("")
+	t.Run("当输入为空时, 默认提供world", func(tt *testing.T) {
+		got := Hello("", "")
 		want := "Hello, world"
 
-		assertCorrectMessage(t, got, want)
+		assertCorrectMessage(tt, got, want)
 	})
 
 	t.Run("在西班牙", func(t *testing.T) {
@@ -33,6 +33,6 @@ func TestHello(t *testing.T) {
 
 func BenchmarkHello(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Hello("world")
+		Hello("world", "")
 	}
 }
