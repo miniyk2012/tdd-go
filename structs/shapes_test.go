@@ -34,15 +34,18 @@ func TestArea(t *testing.T) {
 	t.Run("表格驱动测试", func(t *testing.T) {
 		// 创建匿名结构体切片
 		areaTest := []struct {
+			name string
 			shape Shape
 			want  float64
 		}{
-			{shape: Rectangle{Width: 12, Height: 6}, want: 72},
-			{Circle{10}, 314.1592653589793},
-			{Triangle{12, 6}, 35.0},
+			{name: "Rectangle", shape: Rectangle{Width: 12, Height: 6}, want: 72},
+			{"Circle", Circle{10}, 314.1592653589793},
+			{"Triangle", Triangle{12, 6}, 36.0},
 		}
 		for _, tt := range areaTest {
-			checkArea(t, tt.shape, tt.want)
+			t.Run(tt.name, func(t *testing.T) {
+				checkArea(t, tt.shape, tt.want)
+			})
 		}
 	})
 }
