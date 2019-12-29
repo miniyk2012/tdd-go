@@ -1,6 +1,9 @@
 package pointers
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // 从现有的类型创建新的类型
 type Bitcoin int
@@ -25,6 +28,10 @@ func (w *Wallet) Balance() Bitcoin {
 	return w.balance
 }
 
-func (w *Wallet) Withdraw(amount Bitcoin) {
+func (w *Wallet) Withdraw(amount Bitcoin) error {
+	if w.balance < amount {
+		return errors.New("cannot withdraw, insufficient funds") // return, 而不是抛出error
+	}
 	w.balance -= amount
+	return nil
 }
