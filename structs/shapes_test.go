@@ -28,7 +28,7 @@ func TestArea(t *testing.T) {
 	
 	t.Run("circle Area", func(t *testing.T) {
 		circle := Circle{10}
-		checkArea(t, circle, 314.159265358973)
+		checkArea(t, circle, 314.1592653589793)
 	})
 	
 }
