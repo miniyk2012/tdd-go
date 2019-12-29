@@ -24,3 +24,7 @@ func (w *Wallet) Balance() Bitcoin {
 	fmt.Println("address of balance in Balance is", &w.balance)
 	return w.balance
 }
+
+func (w *Wallet) Withdraw(amount Bitcoin) {
+	w.balance -= amount
+}
