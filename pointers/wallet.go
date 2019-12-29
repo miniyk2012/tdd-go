@@ -5,6 +5,11 @@ import "fmt"
 // 从现有的类型创建新的类型
 type Bitcoin int
 
+// 实现 Bitcoin 的 fmt/print/Stringer 接口, '%s'时会使用该方法
+func (b Bitcoin) String() string {
+	return fmt.Sprintf("%d BTC", b)
+}
+
 type Wallet struct {
 	balance Bitcoin
 }
