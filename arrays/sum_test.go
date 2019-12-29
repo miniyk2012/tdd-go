@@ -7,6 +7,7 @@ import (
 
 func TestSum(t *testing.T) {
 	checkSum := func(t *testing.T, got, want []int) {
+		t.Helper()
 		// 在 Go 中不能对切片使用等号运算符, 必须迭代每个元素
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("got %v want %v", got, want)
