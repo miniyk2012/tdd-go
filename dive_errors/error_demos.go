@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/build"
 	"path/filepath"
+	"strings"
 )
 
 var x = build.NoGoError{"wawa"}
@@ -26,11 +27,16 @@ func (e *errorString) Eror() string {
 	return e.s
 }
 
-
 func main() {
 	x := errorString{"text"}
 	a := New("牛逼23")
 	fmt.Println(a)
 	fmt.Println(x)
 	fmt.Println(a.Eror())
+	s := []string{"tuid"}
+	fmt.Print(s[0] == "tuid")
+	line := "tuid,age,sex"
+	ss := strings.Split(line, ",")
+	fmt.Print(ss[0] == "tuid")
+
 }
