@@ -98,3 +98,41 @@ func TestReturn(t *testing.T) {
 	})
 
 }
+
+func TestArray(t *testing.T) {
+	var arr1 [3]int
+	arr2 := arr1  // copy一个新的array
+	fmt.Println(arr1[0])
+
+	var sl1 []int
+	fmt.Println(sl1 == nil)  // true
+	fmt.Println(sl1)
+	fmt.Printf("len=%d, cap=%d\n", len(sl1), cap(sl1))
+
+	fmt.Println(arr2)
+	arr1[0] = 5
+	fmt.Println(arr2)
+	fmt.Println(arr1)
+
+	sl2 := make([]int, 0)
+	fmt.Println(sl2)
+	fmt.Println(sl2 == nil)  // false
+	fmt.Printf("len=%d, cap=%d\n", len(sl2), cap(sl2))
+
+	fmt.Println(nil)
+}
+
+func TestSlice(t *testing.T) {
+	b := []byte{'g', 'o', 'l', 'a', 'n', 'g'}
+	fmt.Println( b)
+	c := b[1:4]  // c与slice共享内存
+	c[2] = 66
+	fmt.Println( b)
+	fmt.Println( c)
+
+	x := [3]string{"Лайка", "Белка", "Стрелка"}
+	s := x[:]  // s与数组共享内存
+	s[1] = "yangkai"
+	fmt.Println(x)
+	fmt.Println(s)
+}
