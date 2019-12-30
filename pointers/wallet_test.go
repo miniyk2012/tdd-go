@@ -101,11 +101,11 @@ func TestReturn(t *testing.T) {
 
 func TestArray(t *testing.T) {
 	var arr1 [3]int
-	arr2 := arr1  // copy一个新的array
+	arr2 := arr1 // copy一个新的array
 	fmt.Println(arr1[0])
 
 	var sl1 []int
-	fmt.Println(sl1 == nil)  // true
+	fmt.Println(sl1 == nil) // true
 	fmt.Println(sl1)
 	fmt.Printf("len=%d, cap=%d\n", len(sl1), cap(sl1))
 
@@ -116,23 +116,48 @@ func TestArray(t *testing.T) {
 
 	sl2 := make([]int, 0)
 	fmt.Println(sl2)
-	fmt.Println(sl2 == nil)  // false
+	fmt.Println(sl2 == nil) // false
 	fmt.Printf("len=%d, cap=%d\n", len(sl2), cap(sl2))
 
 	fmt.Println(nil)
+
+	fmt.Println(make([]int, 5, 6))
 }
 
 func TestSlice(t *testing.T) {
 	b := []byte{'g', 'o', 'l', 'a', 'n', 'g'}
-	fmt.Println( b)
-	c := b[1:4]  // c与slice共享内存
+	fmt.Println(b)
+	c := b[1:4] // c与slice共享内存
 	c[2] = 66
-	fmt.Println( b)
-	fmt.Println( c)
+	fmt.Println(b)
+	fmt.Println(c)
 
 	x := [3]string{"Лайка", "Белка", "Стрелка"}
-	s := x[:]  // s与数组共享内存
+	s := x[:] // s与数组共享内存
 	s[1] = "yangkai"
 	fmt.Println(x)
 	fmt.Println(s)
+}
+
+func TestLen(t *testing.T) {
+	s := make([]byte, 5)
+	s = s[2:4]
+	for _, v := range s {
+		fmt.Println(v)  // for是根据len来的, len=2就迭代2次
+	}
+	fmt.Printf("len=%d, cap=%d\n", len(s), cap(s))
+	s = s[:cap(s)]                                 // We can grow s to its capacity by slicing it againd
+	for _, v := range s {
+		fmt.Println(v)  // len增加为3, 就迭代3次
+	}
+	fmt.Printf("len=%d, cap=%d\n", len(s), cap(s)) // A slice cannot be grown beyond its capacity
+}
+
+func TestAppend(t *testing.T) {
+	a := make([]int, 1, 5)
+	fmt.Printf("len=%d, cap=%d\n", len(a), cap(a))
+	// a == []int{0}
+	a = append(a, 1, 2, 3)
+	// a == []int{0, 1, 2, 3}
+	fmt.Printf("len=%d, cap=%d\n", len(a), cap(a))
 }
