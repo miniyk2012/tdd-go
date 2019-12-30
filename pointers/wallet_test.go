@@ -161,3 +161,24 @@ func TestAppend(t *testing.T) {
 	// a == []int{0, 1, 2, 3}
 	fmt.Printf("len=%d, cap=%d\n", len(a), cap(a))
 }
+
+func Filter(s []int, fn func(int) bool) []int {
+	//r := make([]int, 0)
+	var r []int  // == nil
+	for i := range s {
+		if fn(s[i]) {
+			r = append(r, s[i])
+		}
+	}
+	return r
+}
+func notZero(v int) bool {
+	return v != 0
+}
+
+func TestFilter(t *testing.T) {
+	s := []int {10, 0, 12, 0, -2}
+	f := Filter(s, notZero)
+	fmt.Println(f)
+	fmt.Println(s)
+}
