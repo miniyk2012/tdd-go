@@ -1,13 +1,18 @@
 package maps
 
-import "errors"
-
 type Dictionary map[string]string
 
-var (
-	ErrNotFound   = errors.New("could not find the word you were looking for")
-	ErrWordExists = errors.New("word has existed")
+const (
+	ErrNotFound   = DictionaryErr("could not find the word you were looking for")
+	ErrWordExists = DictionaryErr("word has existed")
+	ErrWordDoesNotExist = DictionaryErr("word does not exist")
 )
+
+type DictionaryErr string
+
+func (e DictionaryErr) Error() string {
+	return string(e)
+}
 
 func (dic Dictionary) Search(word string) (string, error) {
 	// 通过 map[key] 的方式从 map 中获取值
@@ -30,4 +35,21 @@ func (dic Dictionary) Add(key string, value string) error {
 		return err
 	}
 	return nil
+}
+
+func (dic Dictionary) Update(word string, definition string) error {
+	_, err := dic.Search(word)
+	switch err {
+	case ErrNotFound:
+		return ErrWordDoesNotExist
+	case nil:
+		dic[word] = definition
+	default:
+		return err
+	}
+	return nil
+}
+
+func (dic Dictionary) Delete(word string) {
+	delete(dic, word)
 }
