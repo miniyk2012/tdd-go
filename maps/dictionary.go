@@ -4,8 +4,9 @@ import "errors"
 
 type Dictionary map[string]string
 
-var ErrNotFound = errors.New("could not find the word you were looking for")
-var ErrWordExists = errors.New("word has existed")
+var ( ErrNotFound = errors.New("could not find the word you were looking for")
+    ErrWordExists = errors.New("word has existed")
+)
 func (dic Dictionary) Search(word string) (string, error) {
 	// 通过 map[key] 的方式从 map 中获取值
 	value, ok := dic[word]

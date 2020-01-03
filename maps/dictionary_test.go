@@ -1,6 +1,7 @@
 package maps
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -47,6 +48,32 @@ func TestAdd(t *testing.T) {
 		assertError(t, err, ErrWordExists)
 		assertDefinition(t, dictionary, word, definition)
 	})
+}
+
+func TestFor(t *testing.T) {
+	m := map[string]int{
+		"a": 1,
+		"b": 2,
+	}
+	var (
+		bs []*int
+		vs []*string
+	)
+
+	for k, v := range m {
+		fmt.Printf("k:[%p].v:[%p]\n", &k, &v) // 这里的输出可以看到，k一直使用同一块内存，v也是这个状况
+		bs = append(bs, &v)                   // 对v取了地址
+		vs = append(vs, &k)
+	}
+
+	// 输出
+	for _, b := range bs {
+		fmt.Println(*b) // 输出都是1或者都是2
+	}
+	for _, bb := range vs {
+		fmt.Println(*bb)
+	}
+
 }
 
 func assertDefinition(t *testing.T, dictionary Dictionary, word string, definition string) {
