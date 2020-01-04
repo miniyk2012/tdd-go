@@ -3,8 +3,8 @@ package maps
 type Dictionary map[string]string
 
 const (
-	ErrNotFound   = DictionaryErr("could not find the word you were looking for")
-	ErrWordExists = DictionaryErr("word has existed")
+	ErrNotFound         = DictionaryErr("could not find the word you were looking for")
+	ErrWordExists       = DictionaryErr("word has existed")
 	ErrWordDoesNotExist = DictionaryErr("word does not exist")
 )
 

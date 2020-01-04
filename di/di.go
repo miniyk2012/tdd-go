@@ -20,5 +20,5 @@ func MyGreeterHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	Greet(os.Stdout, "Elodie")
 	http.ListenAndServe(":5000", http.HandlerFunc(MyGreeterHandler))
-	Greet(os.Stdout, "Yangkai")  // 不会运行到
+	Greet(os.Stdout, "Yangkai") // 不会运行到
 }
