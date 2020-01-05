@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	sleeper := &ConfigurableSleeper{1 * time.Second}
+	sleeper := &ConfigurableSleeper{1 * time.Second, time.Sleep}
 	Countdown(os.Stdout, sleeper)
 }
 
@@ -31,10 +31,19 @@ func (s *SpySleeper) Sleep() {
 
 type ConfigurableSleeper struct {
 	duration time.Duration
+	sleep    func(time.Duration) // 接受一个函数, 它的签名是: func(time.Duration), 没有返回值
 }
 
 func (s *ConfigurableSleeper) Sleep() {
-	time.Sleep(s.duration)
+	s.sleep(s.duration)
+}
+
+type SpyTime struct {
+	durationSlept time.Duration
+}
+
+func (spy *SpyTime) Sleep(t time.Duration) {
+	spy.durationSlept = t
 }
 
 type CountdownOperationsSpy struct {
