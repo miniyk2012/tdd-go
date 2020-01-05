@@ -37,11 +37,15 @@ func (s *ConfigurableSleeper) Sleep() {
 	time.Sleep(s.duration)
 }
 
-func Countdown(writer io.Writer, sleeper Sleeper) {
-	for i := countdownStart; i >= 1; i-- {
+func Countdown(out io.Writer, sleeper Sleeper) {
+	for i := countdownStart; i > 0; i-- {
 		sleeper.Sleep()
-		fmt.Fprintln(writer, i)
 	}
+
+	for i := countdownStart; i > 0; i-- {
+		fmt.Fprintln(out, i)
+	}
+
 	sleeper.Sleep()
-	fmt.Fprint(writer, finalWord)
+	fmt.Fprint(out, finalWord)
 }
