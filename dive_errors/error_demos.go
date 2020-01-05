@@ -54,7 +54,6 @@ func main() {
 
 }
 
-
 func helper() {
 	// create chrome instance
 	ctx, cancel := chromedp.NewContext(
