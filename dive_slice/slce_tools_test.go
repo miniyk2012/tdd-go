@@ -53,11 +53,60 @@ func TestCap(t *testing.T) {
 func TestGrowingSlice(t *testing.T) {
 	s := []string{"a", "b"}
 	new_s := DoubleCap(s)
+
 	if len(new_s) != len(s) || cap(new_s) != 5 {
 		t.Error("xx")
 	}
-	if !reflect.DeepEqual(s, new_s) {
+	if !reflect.DeepEqual(s, new_s) || !reflect.DeepEqual(s, []string{"a", "b"}) {
 		t.Error("xx")
 	}
 
+}
+
+func TestAppendString(t *testing.T) {
+	t.Run("需要扩容", func(t *testing.T) {
+		s := make([]string, 2, 3)
+		copy(s, []string{"a", "b"})
+		s = AppendString(s, "c", "d", "e", "f", "g")
+		if !reflect.DeepEqual(s, []string{"a", "b", "c", "d", "e", "f", "g"}) {
+			t.Error("xx")
+		}
+		if cap(s) == 3 {
+			t.Error("xx")
+		}
+	})
+
+	t.Run("无需扩容", func(t *testing.T) {
+		s := make([]string, 2, 100)
+		copy(s, []string{"a", "b"})
+		s = AppendString(s, "c", "d", "e", "f", "g")
+		if !reflect.DeepEqual(s, []string{"a", "b", "c", "d", "e", "f", "g"}) {
+			t.Error("xx")
+		}
+		if cap(s) != 100 {
+			t.Error("xx")
+		}
+	})
+}
+
+func TestOriginAppend(t *testing.T) {
+	a := make([]string, 2, 100)
+	copy(a, []string{"John", "Paul"})
+	b := []string{"George", "Ringo", "Pete"}
+	a = append(a, b...)
+	if !reflect.DeepEqual(a, []string{"John", "Paul", "George", "Ringo", "Pete"}) {
+		t.Error("xx")
+	}
+	fmt.Println(cap(a))
+}
+
+func TestFilter(t *testing.T) {
+	s := []int{5, 6, 7, 8, 8, 9, 100, -67, 0}
+	fn := func(a int) bool {
+		return a%2 == 0
+	}
+	p := Filter(s, fn)
+	if !reflect.DeepEqual(p, []int{6,8,8,100,0}) {
+		t.Error("xx")
+	}
 }
