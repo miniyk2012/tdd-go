@@ -110,3 +110,13 @@ func TestFilter(t *testing.T) {
 		t.Error("xx")
 	}
 }
+
+func TestFindDigits(t *testing.T) {
+	filename := "file.txt"
+	ret := FindDigits(filename)
+	fmt.Printf("%s\n", ret)
+	fmt.Println(string(ret))  // byte -> string
+	if !reflect.DeepEqual(ret, []byte("943985")) {  // string -> byte
+		t.Error("xxx")
+	}
+}

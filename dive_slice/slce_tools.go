@@ -1,14 +1,12 @@
 package dive_slice
 
 import (
+	"io/ioutil"
 	"regexp"
 )
 
 var digitRegexp = regexp.MustCompile("[0-9]+")
 
-func AppendByte(slice []byte, data ...byte) []byte {
-	return nil
-}
 
 // 扩Cap, 则需要新建一个slice, 把旧的复制过去
 func DoubleCap(s []string) []string {
@@ -43,4 +41,13 @@ func Filter(s []int, fn func(int) bool) []int {
 	}
 	return r
 }
+
+func FindDigits(filename string) []byte {
+	b, _ := ioutil.ReadFile(filename)
+	tmp := digitRegexp.Find(b)
+	ret := make([]byte, len(tmp))
+	copy(ret, tmp)
+	return ret
+}
+
 
