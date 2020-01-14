@@ -20,6 +20,16 @@ func Racer(a, b string) (winner string) {
 	case <-ping(b):
 		return b
 	}
+	//atime := measureResponseTime(a)
+	//fmt.Printf("%s=%v\n", a, atime)
+	//measureResponseTime(b)
+	//btime := measureResponseTime(b)
+	//fmt.Printf("%s=%v\n", b, btime)
+	//if atime < btime {
+	//	return a
+	//} else {
+	//	return b
+	//}
 }
 
 func ping(a string) chan struct{} {
