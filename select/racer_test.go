@@ -42,22 +42,20 @@ func TestRacer(t *testing.T) {
 	})
 
 	t.Run("returns an error if a server doesn't respond within 10s", func(t *testing.T) {
-		serverA := makeTestServer(1 * time.Second + 500 * time.Millisecond)
-		serverB := makeTestServer(3 * time.Second)
+		serverA := makeTestServer(1*time.Second + 500*time.Millisecond)
+		serverB := makeTestServer(2 * time.Second)
 
 		defer serverA.Close()
 		defer serverB.Close()
 
-		ConfigurableRacer(serverA.URL, serverB.URL, 1 * time.Second)
-		//if err == nil {
-		//	t.Error("expected an error but didn't get one")
-		//}
+		_, err := ConfigurableRacer(serverA.URL, serverB.URL, 1*time.Second)
+		if err == nil {
+			t.Error("expected an error but didn't get one")
+		}
 		fmt.Println("ConfigurableRacer Test Done")
 	})
 
 }
-
-
 
 func TestSelectRead(t *testing.T) {
 	start := time.Now()
@@ -86,7 +84,7 @@ func TestSelectRead(t *testing.T) {
 	time.Sleep(2 * time.Second)
 	fmt.Println("Blocking on read...")
 	select {
-	case <-c:  // 从c读数据
+	case <-c: // 从c读数据
 
 		fmt.Printf("Unblocked %v later.\n", time.Since(start))
 
@@ -124,7 +122,7 @@ func TestSelectWrite(t *testing.T) {
 	}
 
 	select {
-	case getChan(0) <- getNumber(2):  // 往channel写数据
+	case getChan(0) <- getNumber(2): // 往channel写数据
 
 		fmt.Println("1th case is selected.")
 	case getChan(1) <- getNumber(3):
@@ -159,7 +157,7 @@ func TestMakeChan(t *testing.T) {
 	//for i := 0; i < 100000; i++ {
 	//	sum += i*23 + 45 - 7*4/2 - 99
 	//}
-	c <- 0  // 如果c = make(chan int), 这里会阻塞, 直到<-c才会才会解除
+	c <- 0 // 如果c = make(chan int), 这里会阻塞, 直到<-c才会才会解除
 	fmt.Println(a)
 	if a != "hello world" {
 		t.Error("xx")

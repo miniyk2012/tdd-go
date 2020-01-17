@@ -8,7 +8,7 @@ import (
 
 var tenSecondTimeout = 10 * time.Second
 
-func Racer(a, b string)  (winner string, err error) {
+func Racer(a, b string) (winner string, err error) {
 	return ConfigurableRacer(a, b, tenSecondTimeout)
 }
 
@@ -43,9 +43,7 @@ func ConfigurableRacer(a, b string, timeout time.Duration) (winner string, err e
 }
 
 func ping(a string) chan struct{} {
-	time.Sleep(time.Second * 3)
-	fmt.Println("ping")
-	fmt.Println(a)
+	fmt.Println("ping", a)
 	c := make(chan struct{})
 	go func() {
 		http.Get(a)
