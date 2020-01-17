@@ -6,8 +6,14 @@ import (
 	"time"
 )
 
+var tenSecondTimeout = 10 * time.Second
+
+func Racer(a, b string)  (winner string, err error) {
+	return ConfigurableRacer(a, b, tenSecondTimeout)
+}
+
 // Racer 返回选择响应比较快的url
-func Racer(a, b string) (winner string, err error) {
+func ConfigurableRacer(a, b string, timeout time.Duration) (winner string, err error) {
 	// select就是用来监听和channel有关的IO操作，当 IO 操作发生时，触发相应的动作。
 	// ping(a), ping(b)依次执行, 由于ping中有协程不阻塞, 因此ping(a)很快就返回, 然后运行ping(b),
 	// 也很快返回. 此时2个chan都没法读, 因此select阻塞, 直到某个协程跑完, close(c)后, c变得可读, 优先返回跑的快的url.
@@ -19,7 +25,8 @@ func Racer(a, b string) (winner string, err error) {
 		return a, nil
 	case <-ping(b):
 		return b, nil
-	case <-time.After(10 * time.Second):
+	case <-time.After(timeout):
+		fmt.Println("timeout")
 		return "", fmt.Errorf("timed out waiting for %s and %s", a, b)
 	}
 
@@ -36,6 +43,8 @@ func Racer(a, b string) (winner string, err error) {
 }
 
 func ping(a string) chan struct{} {
+	time.Sleep(time.Second * 3)
+	fmt.Println("ping")
 	fmt.Println(a)
 	c := make(chan struct{})
 	go func() {
