@@ -13,7 +13,7 @@ func TestRace(t *testing.T) {
 	slowURL := "http://www.sina.cn"
 
 	want := fastURL
-	got := Racer(slowURL, fastURL)
+	got, _ := Racer(slowURL, fastURL)
 
 	if want != got {
 		t.Errorf("got '%s', want '%s'", got, want)
@@ -21,21 +21,42 @@ func TestRace(t *testing.T) {
 }
 
 func TestRacer(t *testing.T) {
-	slowServer := makeTestServer(20 * time.Millisecond)
-	fastServer := makeTestServer(0 * time.Millisecond)
+	t.Run("compares speeds of servers, returning the url of the fastest one", func(t *testing.T) {
+		slowServer := makeTestServer(20 * time.Millisecond)
+		fastServer := makeTestServer(0 * time.Millisecond)
 
-	slowURL := slowServer.URL // http://127.0.0.1:52446
-	fastURL := fastServer.URL // http://127.0.0.1:52447
-	fmt.Printf("slowURL=%s\n", slowURL)
-	fmt.Printf("fastURL=%s\n", fastURL)
+		defer slowServer.Close()
+		defer fastServer.Close()
 
-	want := fastURL
-	got := Racer(slowURL, fastURL)
+		slowURL := slowServer.URL // http://127.0.0.1:52446
+		fastURL := fastServer.URL // http://127.0.0.1:52447
+		fmt.Printf("slowURL=%s\n", slowURL)
+		fmt.Printf("fastURL=%s\n", fastURL)
 
-	if want != got {
-		t.Errorf("got '%s', want '%s'", got, want)
-	}
+		want := fastURL
+		got, _ := Racer(slowURL, fastURL)
+
+		if want != got {
+			t.Errorf("got '%s', want '%s'", got, want)
+		}
+	})
+
+	t.Run("returns an error if a server doesn't respond within 10s", func(t *testing.T) {
+		serverA := makeTestServer(11 * time.Second)
+		serverB := makeTestServer(12 * time.Second)
+
+		defer serverA.Close()
+		defer serverB.Close()
+
+		_, err := Racer(serverA.URL, serverB.URL)
+		if err == nil {
+			t.Error("expected an error but didn't get one")
+		}
+	})
+
 }
+
+
 
 func TestSelectRead(t *testing.T) {
 	start := time.Now()
