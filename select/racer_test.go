@@ -41,14 +41,15 @@ func TestRacer(t *testing.T) {
 		}
 	})
 
-	t.Run("returns an error if a server doesn't respond within 10s", func(t *testing.T) {
-		serverA := makeTestServer(1*time.Second + 500*time.Millisecond)
-		serverB := makeTestServer(2 * time.Second)
+	t.Run("returns an error if a server doesn't respond within 1s", func(t *testing.T) {
+		server := makeTestServer(2*time.Second + 500*time.Millisecond)
 
-		defer serverA.Close()
-		defer serverB.Close()
+		defer func() {
+			fmt.Print("close server")
+			server.Close()
+		}()
 
-		_, err := ConfigurableRacer(serverA.URL, serverB.URL, 1*time.Second)
+		_, err := ConfigurableRacer(server.URL, server.URL, 1*time.Second)
 		if err == nil {
 			t.Error("expected an error but didn't get one")
 		}
@@ -58,6 +59,7 @@ func TestRacer(t *testing.T) {
 }
 
 func TestSelectRead(t *testing.T) {
+
 	start := time.Now()
 	c := make(chan interface{})
 	ch1 := make(chan int)

@@ -44,6 +44,9 @@ func ConfigurableRacer(a, b string, timeout time.Duration) (winner string, err e
 
 func ping(a string) chan struct{} {
 	fmt.Println("ping", a)
+	for i:=0; i<3; i++ {
+		fmt.Println(i)
+	}
 	c := make(chan struct{})
 	go func() {
 		http.Get(a)
