@@ -39,6 +39,21 @@ func BirdAnimation(bird Birds, high int) {
 	bird.Fly(high)
 }
 
+func ChickenAnimation(chicken Chicken) {
+	fmt.Printf("BirdAnimation of %T\n", chicken)
+	chicken.Walk()
+}
+
+func NilInterfaceTest(chicken Chicken) {
+	if chicken == nil {
+		fmt.Println("Sorry,It’s Nil")
+	} else {
+		fmt.Println("Animation Start!")
+		ChickenAnimation(chicken)
+	}
+}
+
+
 func main() {
 	var bird Birds
 	sparrow := &Sparrow{name: "yangkai"}
@@ -46,4 +61,7 @@ func main() {
 	BirdAnimation(bird, 1000)
 	// 或者将sparrow直接作为参数
 	BirdAnimation(sparrow, 1000)
+
+	var sparrow3 *Sparrow
+	NilInterfaceTest(sparrow3)
 }
