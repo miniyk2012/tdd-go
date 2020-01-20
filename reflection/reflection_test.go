@@ -69,6 +69,21 @@ func TestWalk(t *testing.T) {
 			},
 			[]string{"London", "Reykjavík"},
 		},
+		{
+			"Maps",
+			map[string]interface{} {
+				"Foo": "Bar",
+				"Baz": "Boz",
+				"yangkai": Person {
+					"yangkai",
+					Profile{
+						Age:  30,
+						City: "常州",
+					},
+				},
+			},
+			[]string{"Bar", "Boz", "yangkai", "常州"},
+		},
 	}
 
 	for _, test := range cases {
