@@ -50,20 +50,20 @@ func TestWalk(t *testing.T) {
 			[]string{"Chris", "London"},
 		},
 		{
-					"Slices",
-					[]Profile {
-						{33, "London"},
-						{34, "Beijing"},
-					},
-					[]string {"London", "Beijing"},
+			"Slices",
+			[]Profile{
+				{33, "London"},
+				{34, "Beijing"},
+			},
+			[]string{"London", "Beijing"},
 		},
 		{"pure string",
 			"Chris",
-		[]string {"Chris"},
+			[]string{"Chris"},
 		},
 		{
 			"Arrays",
-			[2]Profile {
+			[2]Profile{
 				{33, "London"},
 				{34, "Reykjavík"},
 			},
@@ -71,10 +71,10 @@ func TestWalk(t *testing.T) {
 		},
 		{
 			"Maps",
-			map[string]interface{} {
+			map[string]interface{}{
 				"Foo": "Bar",
 				"Baz": "Boz",
-				"yangkai": Person {
+				"yangkai": Person{
 					"yangkai",
 					Profile{
 						Age:  30,
