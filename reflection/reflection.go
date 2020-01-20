@@ -7,25 +7,26 @@ import (
 // 编写函数 walk(x interface{}, fn func(string))，参数为结构体 x，并对 x 中的所有字符串字段调用 fn 函数
 func walk(x interface{}, fn func(string)) {
 	val := getValue(x)
-	var getField func(int) reflect.Value
-	var numberOfValues int
+
+	walkValue := func(value reflect.Value) {
+		walk(value.Interface(), fn)
+	}
+
 	switch val.Kind() {
 	case reflect.Slice, reflect.Array:
-		numberOfValues = val.Len()
-		getField = val.Index
+		for i := 0; i < val.Len(); i++ {
+			walkValue(val.Index(i))
+		}
 	case reflect.Struct:
-		numberOfValues = val.NumField()
-		getField = val.Field
+		for i := 0; i < val.NumField(); i++ {
+			walkValue(val.Field(i))
+		}
 	case reflect.Map:
 		for _, key := range val.MapKeys() {
-			walk(val.MapIndex(key).Interface(), fn)
+			walkValue(val.MapIndex(key))
 		}
 	case reflect.String:
 		fn(val.String())
-	}
-
-	for i := 0; i < numberOfValues; i++ {
-		walk(getField(i).Interface(), fn)
 	}
 
 }
