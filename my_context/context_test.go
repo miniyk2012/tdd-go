@@ -2,42 +2,19 @@ package my_context
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 )
 
-type StubStore struct {
-	response string
-}
-
-func (s *StubStore) Fetch() string {
-	return s.response
-}
-
-func (s *StubStore) Cancel() {
-}
-
-type SpyStore struct {
-	response  string
-	cancelled bool
-}
-
-func (s *SpyStore) Fetch() string {
-	time.Sleep(100 * time.Millisecond)
-	return s.response
-}
-
-func (s *SpyStore) Cancel() {
-	s.cancelled = true
-}
-
 func TestHandler(t *testing.T) {
 	data := "hello, world"
 
-	t.Run("test hello world", func(t *testing.T) {
-		svr := Server(&StubStore{data})
+	t.Run("returns data from store", func(t *testing.T) {
+		store := &SpyStore{response: data, t: t}
+		svr := Server(store)
 
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
 		response := httptest.NewRecorder()
@@ -47,24 +24,24 @@ func TestHandler(t *testing.T) {
 		if response.Body.String() != data {
 			t.Errorf(`got "%s", want "%s"`, response.Body.String(), data)
 		}
+
+		store.assertWasNotCancelled()
 	})
 
 	t.Run("tells store to cancel work if request is cancelled", func(t *testing.T) {
-		store := &SpyStore{response: data}
+		store := &SpyStore{response: data, t: t}
 		svr := Server(store)
 
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
 
 		cancellingCtx, cancel := context.WithCancel(request.Context())
-		time.AfterFunc(5*time.Millisecond, cancel)
-		request = request.WithContext(cancellingCtx)
+		time.AfterFunc(5*time.Millisecond, cancel)   // 5ms秒后运行cancel函数, 会使ctx.Done()返回的chan关闭
+		request = request.WithContext(cancellingCtx) // request使用cancellingCtx
 
 		response := httptest.NewRecorder()
 
 		svr.ServeHTTP(response, request)
 
-		if !store.cancelled {
-			t.Errorf("store was not told to cancel")
-		}
+		store.assertWasCancelled()
 	})
 }
