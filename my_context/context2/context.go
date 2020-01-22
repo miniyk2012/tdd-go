@@ -12,8 +12,8 @@ type Store interface {
 
 func Server(store Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data, err := store.Fetch(r.Context())
-		if err != nil {
+		data, err := store.Fetch(r.Context())  // 应该把context传入, 让Fetch负责上下文管理
+		if err != nil {  // 如果取消, 会抛出错误
 			return // todo: log error however you like
 		}
 
