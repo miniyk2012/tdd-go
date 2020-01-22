@@ -35,11 +35,11 @@ func TestContext2(t *testing.T) {
 		time.AfterFunc(5*time.Millisecond, cancel)
 		request = request.WithContext(cancellingCtx)
 
-		response := &SpyResponseWriter{}
+		response := httptest.NewRecorder()
 		fmt.Print(response)
 
 		svr.ServeHTTP(response, request)
-		if response.written {
+		if response.Body.String() == data {
 			t.Error("a response should not have been written")
 		}
 	})
