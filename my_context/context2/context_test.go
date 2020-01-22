@@ -10,7 +10,7 @@ import (
 )
 
 func TestContext2(t *testing.T) {
-	data := ""
+	data := "Hello world"
 	t.Run("returns data from store", func(t *testing.T) {
 		store := &SpyStore{response: data, t: t}
 		svr := Server(store)
@@ -27,7 +27,7 @@ func TestContext2(t *testing.T) {
 
 	for _, data := range [][]string{
 		{"", "request cancle when data is empty data"},
-		{"hello world", "request cancle when data is hello world"},
+		{"hello world lalallalal", "request cancle when data is hello world lalallalal"},
 	} {
 		t.Run(data[1], func(t *testing.T) {
 			store := &SpyStore{response: data[0], t: t}
@@ -36,11 +36,11 @@ func TestContext2(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, "/", nil)
 
 			cancellingCtx, cancel := context.WithCancel(request.Context())
-			time.AfterFunc(5*time.Millisecond, cancel)
+			time.AfterFunc(50*time.Millisecond, cancel)
 			request = request.WithContext(cancellingCtx)
 
 			response := &SpyResponseWriter{}
-			fmt.Print(response)
+			fmt.Println(response)
 
 			svr.ServeHTTP(response, request)
 			if response.written {

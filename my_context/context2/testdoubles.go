@@ -18,7 +18,6 @@ func (s *SpyStore) Fetch(ctx context.Context) (string, error) {
 	data := make(chan string, 1)
 
 	go func() {
-		time.Sleep(10 * time.Millisecond)
 		var result string
 		for _, c := range s.response {
 			fmt.Println(c)
@@ -30,6 +29,7 @@ func (s *SpyStore) Fetch(ctx context.Context) (string, error) {
 				result += string(c)
 			}
 		}
+		time.Sleep(50 * time.Millisecond)
 		data <- result
 	}()
 

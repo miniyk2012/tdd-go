@@ -27,7 +27,7 @@ func TestHandler(t *testing.T) {
 		store.assertWasNotCancelled()
 	})
 
-	// 我们取消request, 可以使请求在服务器端终止
+	// 我们在客户端取消request, 服务器端也能发现
 	t.Run("tells store to cancel work if request is cancelled", func(t *testing.T) {
 		store := &SpyStore{response: data, t: t}
 		svr := Server(store)
@@ -35,7 +35,7 @@ func TestHandler(t *testing.T) {
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
 
 		cancellingCtx, cancel := context.WithCancel(request.Context())
-		time.AfterFunc(5*time.Millisecond, cancel)   // 5ms秒后运行cancel函数, 会使ctx.Done()返回的chan关闭
+		time.AfterFunc(25*time.Millisecond, cancel)   // 5ms秒后运行cancel函数, 会使ctx.Done()返回的chan关闭
 		request = request.WithContext(cancellingCtx) // request使用cancellingCtx
 
 		response := httptest.NewRecorder()
