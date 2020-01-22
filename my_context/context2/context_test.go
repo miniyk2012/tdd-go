@@ -1,16 +1,16 @@
-package my_context
+package context2
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 )
 
-func TestHandler(t *testing.T) {
-	data := "hello, world"
-
+func TestContext2(t *testing.T) {
+	data := ""
 	t.Run("returns data from store", func(t *testing.T) {
 		store := &SpyStore{response: data, t: t}
 		svr := Server(store)
@@ -23,11 +23,8 @@ func TestHandler(t *testing.T) {
 		if response.Body.String() != data {
 			t.Errorf(`got "%s", want "%s"`, response.Body.String(), data)
 		}
-
-		store.assertWasNotCancelled()
 	})
 
-	// 我们取消request, 可以使请求在服务器端终止
 	t.Run("tells store to cancel work if request is cancelled", func(t *testing.T) {
 		store := &SpyStore{response: data, t: t}
 		svr := Server(store)
@@ -35,13 +32,15 @@ func TestHandler(t *testing.T) {
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
 
 		cancellingCtx, cancel := context.WithCancel(request.Context())
-		time.AfterFunc(5*time.Millisecond, cancel)   // 5ms秒后运行cancel函数, 会使ctx.Done()返回的chan关闭
-		request = request.WithContext(cancellingCtx) // request使用cancellingCtx
+		time.AfterFunc(5*time.Millisecond, cancel)
+		request = request.WithContext(cancellingCtx)
 
-		response := httptest.NewRecorder()
+		response := &SpyResponseWriter{}
+		fmt.Print(response)
 
 		svr.ServeHTTP(response, request)
-
-		store.assertWasCancelled()
+		if response.written {
+			t.Error("a response should not have been written")
+		}
 	})
 }
