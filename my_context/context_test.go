@@ -35,7 +35,7 @@ func TestHandler(t *testing.T) {
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
 
 		cancellingCtx, cancel := context.WithCancel(request.Context())
-		time.AfterFunc(25*time.Millisecond, cancel)   // 5ms秒后运行cancel函数, 会使ctx.Done()返回的chan关闭
+		time.AfterFunc(13*time.Millisecond, cancel)   // 5ms秒后运行cancel函数, 会使ctx.Done()返回的chan关闭
 		request = request.WithContext(cancellingCtx) // request使用cancellingCtx
 
 		response := httptest.NewRecorder()
