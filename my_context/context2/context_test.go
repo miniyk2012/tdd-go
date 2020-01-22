@@ -34,10 +34,12 @@ func TestContext2(t *testing.T) {
 			svr := Server(store)
 
 			request := httptest.NewRequest(http.MethodGet, "/", nil)
-			oldCtx := request.Context()
-			cancellingCtx, cancel := context.WithCancel(oldCtx)
-			time.AfterFunc(50*time.Millisecond, cancel)
-			request = request.WithContext(cancellingCtx)
+			grandfatherCtx := request.Context()
+
+			fatherCtx, fatherCancel := context.WithCancel(grandfatherCtx)
+			childCtx, _ := context.WithCancel(fatherCtx)
+			time.AfterFunc(50*time.Millisecond, fatherCancel) // 终止fatherCtx, 也能终止childCtx
+			request = request.WithContext(childCtx)
 
 			response := &SpyResponseWriter{}
 			fmt.Println(response)
@@ -46,7 +48,9 @@ func TestContext2(t *testing.T) {
 			if response.written {
 				t.Error("a response should not have been written")
 			}
-			fmt.Println(oldCtx)
+			<-fatherCtx.Done()
+			<-childCtx.Done()
+			fmt.Println("终止")
 		})
 	}
 
