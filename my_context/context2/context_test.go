@@ -34,8 +34,8 @@ func TestContext2(t *testing.T) {
 			svr := Server(store)
 
 			request := httptest.NewRequest(http.MethodGet, "/", nil)
-
-			cancellingCtx, cancel := context.WithCancel(request.Context())
+			oldCtx := request.Context()
+			cancellingCtx, cancel := context.WithCancel(oldCtx)
 			time.AfterFunc(50*time.Millisecond, cancel)
 			request = request.WithContext(cancellingCtx)
 
@@ -46,6 +46,7 @@ func TestContext2(t *testing.T) {
 			if response.written {
 				t.Error("a response should not have been written")
 			}
+			fmt.Println(oldCtx)
 		})
 	}
 
