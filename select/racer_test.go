@@ -13,7 +13,7 @@ func TestRace(t *testing.T) {
 	slowURL := "http://www.sina.cn"
 
 	want := fastURL
-	got := Racer(slowURL, fastURL)
+	got, _ := Racer(slowURL, fastURL)
 
 	if want != got {
 		t.Errorf("got '%s', want '%s'", got, want)
@@ -21,23 +21,45 @@ func TestRace(t *testing.T) {
 }
 
 func TestRacer(t *testing.T) {
-	slowServer := makeTestServer(20 * time.Millisecond)
-	fastServer := makeTestServer(0 * time.Millisecond)
+	t.Run("compares speeds of servers, returning the url of the fastest one", func(t *testing.T) {
+		slowServer := makeTestServer(20 * time.Millisecond)
+		fastServer := makeTestServer(0 * time.Millisecond)
 
-	slowURL := slowServer.URL // http://127.0.0.1:52446
-	fastURL := fastServer.URL // http://127.0.0.1:52447
-	fmt.Printf("slowURL=%s\n", slowURL)
-	fmt.Printf("fastURL=%s\n", fastURL)
+		defer slowServer.Close()
+		defer fastServer.Close()
 
-	want := fastURL
-	got := Racer(slowURL, fastURL)
+		slowURL := slowServer.URL // http://127.0.0.1:52446
+		fastURL := fastServer.URL // http://127.0.0.1:52447
+		fmt.Printf("slowURL=%s\n", slowURL)
+		fmt.Printf("fastURL=%s\n", fastURL)
 
-	if want != got {
-		t.Errorf("got '%s', want '%s'", got, want)
-	}
+		want := fastURL
+		got, _ := Racer(slowURL, fastURL)
+
+		if want != got {
+			t.Errorf("got '%s', want '%s'", got, want)
+		}
+	})
+
+	t.Run("returns an error if a server doesn't respond within 1s", func(t *testing.T) {
+		server := makeTestServer(2*time.Second + 500*time.Millisecond)
+
+		defer func() {
+			fmt.Print("close server")
+			server.Close()
+		}()
+
+		_, err := ConfigurableRacer(server.URL, server.URL, 1*time.Second)
+		if err == nil {
+			t.Error("expected an error but didn't get one")
+		}
+		fmt.Println("ConfigurableRacer Test Done")
+	})
+
 }
 
 func TestSelectRead(t *testing.T) {
+
 	start := time.Now()
 	c := make(chan interface{})
 	ch1 := make(chan int)
@@ -45,7 +67,7 @@ func TestSelectRead(t *testing.T) {
 
 	go func() {
 
-		time.Sleep(4 * time.Second)
+		time.Sleep(1 * time.Second)
 		close(c)
 	}()
 
@@ -61,9 +83,10 @@ func TestSelectRead(t *testing.T) {
 		ch2 <- 5
 	}()
 
+	time.Sleep(2 * time.Second)
 	fmt.Println("Blocking on read...")
 	select {
-	case <-c:
+	case <-c: // 从c读数据
 
 		fmt.Printf("Unblocked %v later.\n", time.Since(start))
 
@@ -74,6 +97,9 @@ func TestSelectRead(t *testing.T) {
 
 		fmt.Printf("ch1 case...")
 	default:
+		// 如果有一个或多个IO操作可以完成，则Go运行时系统会随机的选择一个执行，
+		// 否则的话，如果有default分支，则执行default分支语句，如果连default都没有，
+		// 则select语句会一直阻塞，直到至少有一个IO操作可以进行.
 
 		fmt.Printf("default go...")
 	}
@@ -81,12 +107,13 @@ func TestSelectRead(t *testing.T) {
 
 func TestSelectWrite(t *testing.T) {
 	// make(chan int) 是 unbuffered channel, send 之后 send 语句会阻塞执行，直到有人 receive 之后 send 解除阻塞，后面的语句接着执行。
-	var ch1 chan int = make(chan int, 1)
-	var ch2 chan int = make(chan int, 1)
+	var ch1 chan int = make(chan int)
+	var ch2 chan int = make(chan int)
 	var chs = []chan int{ch1, ch2}
 	var numbers = []int{1, 2, 3, 4, 5}
-
+	// 所有channel表达式都会被求值、所有被发送的表达式都会被求值。求值顺序：自上而下、从左到右.
 	getNumber := func(i int) int {
+		time.Sleep(1 * time.Second)
 		fmt.Printf("numbers[%d]=%v\n", i, numbers[i])
 
 		return numbers[i]
@@ -97,7 +124,7 @@ func TestSelectWrite(t *testing.T) {
 	}
 
 	select {
-	case getChan(0) <- getNumber(2):
+	case getChan(0) <- getNumber(2): // 往channel写数据
 
 		fmt.Println("1th case is selected.")
 	case getChan(1) <- getNumber(3):
@@ -119,26 +146,33 @@ func TestMakeChan(t *testing.T) {
 	// 所以执行到 c <- 0 时并不会阻塞 fmt.Println(a) 的执行，这时 a 可能是 "hello world" 也可能是空，
 	// 看两个 goroutine 谁执行的更快
 
-	var c = make(chan int, 1)
+	//var c = make(chan int, 1)
+	var c = make(chan int)
 	var a string
 
 	go func() {
 		a = "hello world"
 		<-c
 	}()
-	// 模拟耗时操作
-	// sum := 0
-	// for i := 0; i < 100000; i++ {
-	// 	sum += i*23 + 45 - 7*4/2 - 99
-	// }
-	c <- 0
+	//模拟耗时操作
+	//sum := 0
+	//for i := 0; i < 100000; i++ {
+	//	sum += i*23 + 45 - 7*4/2 - 99
+	//}
+	c <- 0 // 如果c = make(chan int), 这里会阻塞, 直到<-c才会才会解除
 	fmt.Println(a)
+	if a != "hello world" {
+		t.Error("xx")
+	}
 }
 
 func makeTestServer(delay time.Duration) *httptest.Server {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Printf("start sleep %v\n", delay)
 		time.Sleep(delay)
 		w.WriteHeader(http.StatusOK)
+		fmt.Printf("sleep %v\n", delay)
 	}))
+
 	return server
 }
